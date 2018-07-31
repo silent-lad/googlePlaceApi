@@ -1,7 +1,7 @@
 const C = require("./common");
 
 let method, latLng;
-let seed = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${latLng}&${method}&type=gym&key=AIzaSyAmXKb4SbPsIq-pKNNTCm0lSGtJtYcVeaw`;
+// let seed = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${latLng}&${method}&type=gym&key=AIzaSyAmXKb4SbPsIq-pKNNTCm0lSGtJtYcVeaw`;
 
 // let id = require("./id_vasant_kunj.json");
 // latLng = id[0].center.latLng;
@@ -13,7 +13,7 @@ let getPlaceId = (method, latLng, next_page_token, name) => {
   if (next_page_token) {
     request = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?pagetoken=${next_page_token}&key=AIzaSyAmXKb4SbPsIq-pKNNTCm0lSGtJtYcVeaw`;
   } else {
-    request = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${latLng}&${method}&type=gym&key=AIzaSyAmXKb4SbPsIq-pKNNTCm0lSGtJtYcVeaw`;
+    request = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${latLng}&${method}&key=AIzaSyAmXKb4SbPsIq-pKNNTCm0lSGtJtYcVeaw`;
   }
   C.req.get(request, (err, res, body) => {
     if (body != undefined) {
