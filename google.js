@@ -1,81 +1,63 @@
 const C = require("./common");
 
 let method, latLng;
-// let seed = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${latLng}&${method}&type=gym&key=AIzaSyAmXKb4SbPsIq-pKNNTCm0lSGtJtYcVeaw`;
 
-// let id = require("./id_vasant_kunj.json");
-// latLng = id[0].center.latLng;
-// method = "rankby=distance";
-// let cnt = 0;
+let id = require("./id_vasant_kunj.json");
+latLng = id[0].center.latLng;
+method = "rankby=distance";
+let cnt = 0;
+let name = "vasantkunj";
 
 let getPlaceId = (method, latLng, next_page_token, name) => {
   let request;
-  if (next_page_token) {
+  if (next_page_token != null) {
     request = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?pagetoken=${next_page_token}&key=AIzaSyAmXKb4SbPsIq-pKNNTCm0lSGtJtYcVeaw`;
   } else {
     request = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${latLng}&${method}&key=AIzaSyAmXKb4SbPsIq-pKNNTCm0lSGtJtYcVeaw`;
   }
+
   C.req.get(request, (err, res, body) => {
-    if (body != undefined) {
-      // JSON.parse(body);
-      C.async.each(
-        JSON.parse(res.body).results,
-        (place, callback) => {
-          // console.log(place);
-          // console.log(key);
-          // console.log(cnt++);
-          if (
-            C._
-              .lowerCase(place.vicinity)
-              .replace(" ", "")
-              .indexOf(`vasantkunj`) != -1
-          ) {
-            let id = require(`./id/id_${name}.json`);
-            if (id[0][`${place.name}`] == undefined) {
-              id[0][`${place.name}`] = {
-                name: `${place.place_id}`,
-                lat: `${place.geometry.location.lat}`,
-                lng: `${place.geometry.location.lng}`,
-                visited: false
-              };
-            }
-            C.fs.writeFile(`./id/id_${name}.json`, JSON.stringify(id), err => {
-              if (err) {
-                console.log(err);
-              }
-              callback();
-            });
-          } else {
-            // console.log(Object.keys(id));
+    // console.log(JSON.parse(body).next_page_token.slice(0,3), "nextPageToken");
+    C.async.each(
+      JSON.parse(body).results,
+      (place, callback) => {
+        if (C._.lowerCase(place.vicinity).indexOf("vasant kunj") != -1) {
+          let id = require(`./id_vasant_kunj.json`);
+
+          id[0][`${place.name}`] = {
+            name: `${place.place_id}`,
+            lat: `${place.geometry.location.lat}`,
+            lng: `${place.geometry.location.lng}`,
+            visited: false
+          };
+          console.log("place inserted in object", place.name);
+
+          C.fs.writeFile(`./id_vasant_kunj.json`, JSON.stringify(id), () => {
+            console.log("Wriiten on file");
             callback();
-          }
-        },
-        err => {
-          if (err) {
-            console.log(err);
-          } else {
-            console.log("nxt");
-            if (JSON.parse(res.body).next_page_token) {
-              setTimeout(() => {
-                getPlaceId(
-                  null,
-                  null,
-                  JSON.parse(res.body).next_page_token,
-                  name
-                );
-              }, 2000);
-            } else {
-              return;
-            }
-          }
+          });
+        } else {
+          console.log("Not in vicinity");
+          callback();
         }
-      );
-    } else {
-      console.log(err);
-    }
+      },
+      () => {
+        if (JSON.parse(body).next_page_token) {
+          console.log("it has next page");
+          getPlaceId(
+            null,
+            null,
+            JSON.parse(body).next_page_token,
+            "vasantkunj"
+          );
+        } else {
+          console.log("Everything over");
+          return;
+        }
+      }
+    );
   });
 };
 
-// getPlaceId(method, latLng);
-
+// getPlaceId(method, latLng, null, name);
 module.exports = getPlaceId;

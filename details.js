@@ -8,6 +8,10 @@ let details = require(`./details/vasantkunj_details.json`);
 // console.log(placeIdArr);
 let cnt = 0;
 
+var check = data => {
+  return typeof data === "undefined" ? "" : data;
+};
+
 C.async.eachOf(seed[0], (id, key) => {
   let URL = `https://maps.googleapis.com/maps/api/place/details/json?placeid=${
     id.name
@@ -40,30 +44,12 @@ C.async.eachOf(seed[0], (id, key) => {
             // addressComponent: finalBody.result.address_components,
             lat: finalBody.result.geometry.location.lat,
             lng: finalBody.result.geometry.location.lng,
-            plus_code_compound:
-              typeof finalBody.result.plus_code === "undefined"
-                ? ""
-                : finalBody.result.plus_code.compound_code,
-            plus_code_global:
-              typeof finalBody.result.plus_code === "undefined"
-                ? ""
-                : finalBody.result.plus_code.global_code,
-            website:
-              typeof finalBody.result.website === "undefined"
-                ? ""
-                : finalBody.result.website,
-            phone_no:
-              typeof finalBody.result.formatted_phone_number === "undefined"
-                ? ""
-                : finalBody.result.formatted_phone_number,
-            no_of_reviews:
-              typeof finalBody.result.reviews === "undefined"
-                ? 0
-                : finalBody.result.reviews.length,
-            rating:
-              typeof finalBody.result.rating === "undefined"
-                ? 0
-                : finalBody.result.rating
+            plus_code_compound: check(finalBody.result.plus_code.compound_code),
+            plus_code_global: check(finalBody.result.plus_code.global_code),
+            website: check(finalBody.result.website),
+            phone_no: check(finalBody.result.formatted_phone_number),
+            no_of_reviews: check(finalBody.result.reviews.length),
+            rating: check(finalBody.result.rating)
           };
           C.fs.writeFile(
             `./details/vasantkunj_details.json`,

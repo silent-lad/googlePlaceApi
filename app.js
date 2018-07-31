@@ -34,22 +34,20 @@ var raider = () => {
     next => {
       console.log("gih");
 
-      let id = require(`./id/id_${place}.json`);
+      let id = require(`./id_vasant_kunj.json`);
       C.async.forEachOf(id[0], (newPlace, key) => {
-        console.log(key);
-        if (newPlace.visited == false) {
-          var newLatLng = `${newPlace.lat},${newPlace.lng}`;
-          var method = "rankby=distance";
-          retrieve(method, newLatLng, null, place);
-          console.log(id[0][`${key}`].visited);
-
-          id[0][`${key}`].visited = true;
-
-          console.log(id[0][`${key}`].visited);
+        if (key != "center") {
+          console.log(key);
+          if (newPlace.visited == false || typeof newplace === "undefined") {
+            var newLatLng = `${newPlace.lat},${newPlace.lng}`;
+            var method = "rankby=distance";
+            retrieve(method, newLatLng, null, place);
+            id[0][`${key}`].visited = true;
+          }
         }
       });
       setTimeout(() => {
-        C.fs.writeFile(`./id/id_${place}.json`, JSON.stringify(id), err => {
+        C.fs.writeFile(`./id_vasant_kunj.json`, JSON.stringify(id), err => {
           if (err) {
             console.log(err);
           } else {
@@ -65,10 +63,11 @@ var raider = () => {
 
 // Retrieves the first 60 places for our stack
 seedPromise().then(place => {
-  let id = require(`./id/id_${place}.json`);
+  let id = require(`./id_vasant_kunj.json`);
   latLng = id[0].center.latLng;
   method = "rankby=distance";
   console.log(7);
+  console.log(method, latLng, null, place);
 
   retrieve(method, latLng, null, place);
   console.log("DANCE");
