@@ -1,27 +1,31 @@
 const C = require("./common.js");
 
-let seed = require("./id/id_vasantkunj.json");
+let seed = require("./id_vasant_kunj.json");
 
 let placeIdArr = Object.keys(seed[0]);
 let details = require(`./details/vasantkunj_details.json`);
+
+var api_key = require("./api_key.json");
 
 // console.log(placeIdArr);
 let cnt = 0;
 
 var check = data => {
-  return typeof data === "undefined" ? "" : data;
+  return typeof data === "undefined" ? " " : data;
 };
 
 C.async.eachOf(seed[0], (id, key) => {
   let URL = `https://maps.googleapis.com/maps/api/place/details/json?placeid=${
     id.name
-  }&key=AIzaSyCi1-aFgFjvtCVDCveIzygv8iMHjgxAFlQ`;
+  }&key=${api_key.key}`;
   cnt++;
   setTimeout(() => {
     {
       C.req.get(URL, (err, res, body) => {
         // console.log(body);
         try {
+          console.log("done");
+
           var sublocal3, sublocal2, postal;
           finalBody = JSON.parse(body);
           finalBody.result.address_components.forEach(comp => {
@@ -44,11 +48,21 @@ C.async.eachOf(seed[0], (id, key) => {
             // addressComponent: finalBody.result.address_components,
             lat: finalBody.result.geometry.location.lat,
             lng: finalBody.result.geometry.location.lng,
-            plus_code_compound: check(finalBody.result.plus_code.compound_code),
-            plus_code_global: check(finalBody.result.plus_code.global_code),
+            type: finalBody.result.types[0],
+            plus_code_compound:
+              typeof finalBody.result.plus_code === "undefined"
+                ? ""
+                : finalBody.result.plus_code.compound_code,
+            plus_code_global:
+              typeof finalBody.result.plus_code === "undefined"
+                ? ""
+                : finalBody.result.plus_code.global_code,
             website: check(finalBody.result.website),
             phone_no: check(finalBody.result.formatted_phone_number),
-            no_of_reviews: check(finalBody.result.reviews.length),
+            no_of_reviews:
+              typeof finalBody.result.reviews === "undefined"
+                ? ""
+                : finalBody.result.reviews.length,
             rating: check(finalBody.result.rating)
           };
           C.fs.writeFile(
@@ -60,13 +74,7 @@ C.async.eachOf(seed[0], (id, key) => {
           );
         } catch (e) {
           console.log(e);
-          //   console.log(id);
         }
-        // finalBody = JSON.parse(body);
-
-        // console.log(finalBody.adr_address);
-        // console.log(finalBody.name);
-        // console.log(JSON.parse(body));
       });
     }
   }, cnt * 100);
